@@ -38,33 +38,89 @@ export interface PaginatedResponse<T> {
 }
 
 // URLs da API
-const API_BASE_URL = "https://templo-dos-magos-api-80fee8432048.herokuapp.com"
-const CATEGORIAS_URL = `${API_BASE_URL}/categorias`
-const PRODUTOS_URL = `${API_BASE_URL}/produtos`
+export const API_BASE_URL = "https://templo-dos-magos-api-80fee8432048.herokuapp.com"
+const CATEGORIAS_URL = `${API_BASE_URL}/api/categorias` // Corrigido para incluir /api
+const PRODUTOS_URL = `${API_BASE_URL}/api/produtos` // Corrigido para incluir /api
+const AUTH_URL = `${API_BASE_URL}/api/auth/login`
+
+// Interface para resposta de login
+export interface LoginResponse {
+  type: string
+  token: string
+  expires_at: string
+}
+
+// Função para login
+export async function login(email: string, senha: string): Promise<LoginResponse> {
+  const response = await fetch(AUTH_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({ email, senha }),
+  })
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(errorData.message || `Erro ao fazer login: ${response.status}`)
+  }
+
+  return await response.json()
+}
 
 // Funções para buscar dados da API
 export async function getCategorias(): Promise<Categoria[]> {
   try {
-    const response = await fetch(CATEGORIAS_URL)
+    // Adicionar um timestamp para evitar cache
+    const timestamp = new Date().getTime()
+    const response = await fetch(`${CATEGORIAS_URL}?_=${timestamp}`, {
+      headers: {
+        Accept: "application/json",
+        "Cache-Control": "no-cache",
+      },
+    })
 
     if (!response.ok) {
-      throw new Error(`Erro ao buscar categorias: ${response.status}`)
+      console.warn(`API de categorias retornou status ${response.status}.`)
+      return []
     }
 
     const data = await response.json()
     return Array.isArray(data) ? data : data.data || []
   } catch (error) {
-    console.error("Falha ao buscar categorias:", error)
+    console.warn("Falha ao buscar categorias da API.", error)
     return []
   }
 }
 
 export async function getProdutos(page = 1): Promise<PaginatedResponse<Produto>> {
   try {
-    const response = await fetch(`${PRODUTOS_URL}?page=${page}`)
+    // Adicionar um timestamp para evitar cache
+    const timestamp = new Date().getTime()
+    const response = await fetch(`${PRODUTOS_URL}?page=${page}&_=${timestamp}`, {
+      headers: {
+        Accept: "application/json",
+        "Cache-Control": "no-cache",
+      },
+    })
 
     if (!response.ok) {
-      throw new Error(`Erro ao buscar produtos: ${response.status}`)
+      console.warn(`API de produtos retornou status ${response.status}.`)
+      return {
+        meta: {
+          total: 0,
+          perPage: 10,
+          currentPage: page,
+          lastPage: 1,
+          firstPage: 1,
+          firstPageUrl: `${PRODUTOS_URL}?page=1`,
+          lastPageUrl: `${PRODUTOS_URL}?page=1`,
+          nextPageUrl: null,
+          previousPageUrl: null,
+        },
+        data: [],
+      }
     }
 
     const data = await response.json()
@@ -90,7 +146,7 @@ export async function getProdutos(page = 1): Promise<PaginatedResponse<Produto>>
       data: data,
     }
   } catch (error) {
-    console.error("Falha ao buscar produtos:", error)
+    console.warn("Falha ao buscar produtos da API.", error)
     return {
       meta: {
         total: 0,
@@ -111,11 +167,32 @@ export async function getProdutos(page = 1): Promise<PaginatedResponse<Produto>>
 // Função para buscar produtos por categoria
 export async function getProdutosPorCategoria(categoriaId: number, page = 1): Promise<PaginatedResponse<Produto>> {
   try {
+    // Adicionar um timestamp para evitar cache
+    const timestamp = new Date().getTime()
     // Usar o novo padrão de URL para filtrar por categoria
-    const response = await fetch(`${PRODUTOS_URL}?categoria=${categoriaId}&page=${page}`)
+    const response = await fetch(`${PRODUTOS_URL}?categoria=${categoriaId}&page=${page}&_=${timestamp}`, {
+      headers: {
+        Accept: "application/json",
+        "Cache-Control": "no-cache",
+      },
+    })
 
     if (!response.ok) {
-      throw new Error(`Erro ao buscar produtos da categoria: ${response.status}`)
+      console.warn(`API de produtos por categoria retornou status ${response.status}.`)
+      return {
+        meta: {
+          total: 0,
+          perPage: 10,
+          currentPage: page,
+          lastPage: 1,
+          firstPage: 1,
+          firstPageUrl: `${PRODUTOS_URL}?categoria=${categoriaId}&page=1`,
+          lastPageUrl: `${PRODUTOS_URL}?categoria=${categoriaId}&page=1`,
+          nextPageUrl: null,
+          previousPageUrl: null,
+        },
+        data: [],
+      }
     }
 
     const data = await response.json()
@@ -141,7 +218,7 @@ export async function getProdutosPorCategoria(categoriaId: number, page = 1): Pr
       data: data,
     }
   } catch (error) {
-    console.error(`Falha ao buscar produtos da categoria ${categoriaId}:`, error)
+    console.warn(`Falha ao buscar produtos da categoria ${categoriaId}.`, error)
     return {
       meta: {
         total: 0,
@@ -149,8 +226,8 @@ export async function getProdutosPorCategoria(categoriaId: number, page = 1): Pr
         currentPage: page,
         lastPage: 1,
         firstPage: 1,
-        firstPageUrl: `${PRODUTOS_URL}?page=1`,
-        lastPageUrl: `${PRODUTOS_URL}?page=1`,
+        firstPageUrl: `${PRODUTOS_URL}?categoria=${categoriaId}&page=1`,
+        lastPageUrl: `${PRODUTOS_URL}?categoria=${categoriaId}&page=1`,
         nextPageUrl: null,
         previousPageUrl: null,
       },
@@ -162,11 +239,32 @@ export async function getProdutosPorCategoria(categoriaId: number, page = 1): Pr
 // Função para buscar produtos por termo de busca
 export async function getProdutosPorBusca(termo: string, page = 1): Promise<PaginatedResponse<Produto>> {
   try {
+    // Adicionar um timestamp para evitar cache
+    const timestamp = new Date().getTime()
     // Usar o parâmetro "nome" para buscar produtos por nome
-    const response = await fetch(`${PRODUTOS_URL}?nome=${encodeURIComponent(termo)}&page=${page}`)
+    const response = await fetch(`${PRODUTOS_URL}?nome=${encodeURIComponent(termo)}&page=${page}&_=${timestamp}`, {
+      headers: {
+        Accept: "application/json",
+        "Cache-Control": "no-cache",
+      },
+    })
 
     if (!response.ok) {
-      throw new Error(`Erro ao buscar produtos com termo de busca: ${response.status}`)
+      console.warn(`API de busca de produtos retornou status ${response.status}.`)
+      return {
+        meta: {
+          total: 0,
+          perPage: 10,
+          currentPage: page,
+          lastPage: 1,
+          firstPage: 1,
+          firstPageUrl: `${PRODUTOS_URL}?nome=${encodeURIComponent(termo)}&page=1`,
+          lastPageUrl: `${PRODUTOS_URL}?nome=${encodeURIComponent(termo)}&page=1`,
+          nextPageUrl: null,
+          previousPageUrl: null,
+        },
+        data: [],
+      }
     }
 
     const data = await response.json()
@@ -176,20 +274,11 @@ export async function getProdutosPorBusca(termo: string, page = 1): Promise<Pagi
       return data as PaginatedResponse<Produto>
     }
 
-    // Caso contrário, filtrar manualmente e criar uma resposta paginada simulada
-    const termoBusca = termo.toLowerCase()
-    const filteredData = Array.isArray(data)
-      ? data.filter(
-          (produto) =>
-            produto.nome.toLowerCase().includes(termoBusca) ||
-            (produto.descricao && produto.descricao.toLowerCase().includes(termoBusca)),
-        )
-      : []
-
+    // Caso contrário, criar uma resposta paginada simulada
     return {
       meta: {
-        total: filteredData.length,
-        perPage: filteredData.length,
+        total: data.length,
+        perPage: data.length,
         currentPage: 1,
         lastPage: 1,
         firstPage: 1,
@@ -198,10 +287,10 @@ export async function getProdutosPorBusca(termo: string, page = 1): Promise<Pagi
         nextPageUrl: null,
         previousPageUrl: null,
       },
-      data: filteredData,
+      data: data,
     }
   } catch (error) {
-    console.error(`Falha ao buscar produtos com o termo "${termo}":`, error)
+    console.warn(`Falha ao buscar produtos com o termo "${termo}".`, error)
     return {
       meta: {
         total: 0,
@@ -209,8 +298,8 @@ export async function getProdutosPorBusca(termo: string, page = 1): Promise<Pagi
         currentPage: page,
         lastPage: 1,
         firstPage: 1,
-        firstPageUrl: `${PRODUTOS_URL}?page=1`,
-        lastPageUrl: `${PRODUTOS_URL}?page=1`,
+        firstPageUrl: `${PRODUTOS_URL}?nome=${encodeURIComponent(termo)}&page=1`,
+        lastPageUrl: `${PRODUTOS_URL}?nome=${encodeURIComponent(termo)}&page=1`,
         nextPageUrl: null,
         previousPageUrl: null,
       },

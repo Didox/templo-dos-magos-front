@@ -5,6 +5,8 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { CartProvider } from "@/contexts/cart-context"
 import { SearchProvider } from "@/contexts/search-context"
+import { AuthProvider } from "@/contexts/auth-context"
+import { Suspense } from "react"
 
 const nunito = Nunito({ subsets: ["latin"] })
 
@@ -24,14 +26,15 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body className={nunito.className}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          <CartProvider>
-            <SearchProvider>{children}</SearchProvider>
-          </CartProvider>
+          <AuthProvider>
+            <CartProvider>
+              <SearchProvider>
+                <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+              </SearchProvider>
+            </CartProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
   )
 }
-
-
-import './globals.css'

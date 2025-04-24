@@ -31,17 +31,15 @@ export default function ProductCard({ id, title, price, image, color }: ProductC
     }, 1000)
   }
 
+  // Determinar a URL da imagem, usando um placeholder se estiver vazia ou inválida
+  const imageUrl = image && image.trim() !== "" ? image : "/placeholder.svg?height=200&width=200"
+
   return (
     <div
       className={`${color} rounded-2xl p-4 shadow-lg border-2 border-opacity-50 border-purple-700 flex flex-col items-center`}
     >
       <div className="mb-2 relative w-full h-32">
-        <Image
-          src={image && image.trim() !== "" ? image : "/placeholder.svg?height=200&width=200"}
-          alt={title}
-          fill
-          className="object-contain"
-        />
+        <Image src={imageUrl || "/placeholder.svg"} alt={title} fill className="object-contain" />
         <div className="absolute inset-0 pointer-events-none">
           {Array.from({ length: 4 }).map((_, i) => (
             <div
@@ -65,7 +63,7 @@ export default function ProductCard({ id, title, price, image, color }: ProductC
 
       <Button
         className={`${
-          isAdding ? "bg-green-500 hover:bg-green-600" : "bg-cyan-400 hover:bg-cyan-500"
+          isAdding ? "bg-green-500 hover:bg-green-600" : "bg-orange-500 hover:bg-orange-600"
         } text-purple-900 font-bold rounded-xl px-6 transition-colors duration-300`}
         onClick={handleAddToCart}
       >

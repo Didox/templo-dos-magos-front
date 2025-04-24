@@ -48,7 +48,7 @@ export default function CartPage() {
               <h2 className="text-2xl font-bold text-white mb-4">Seu carrinho está vazio</h2>
               <p className="text-purple-300 mb-6">Adicione alguns itens mágicos para começar sua jornada!</p>
               <Link href="/">
-                <Button className="bg-cyan-400 hover:bg-cyan-500 text-purple-900 font-bold py-2 px-6 rounded-xl">
+                <Button className="bg-orange-500 hover:bg-orange-600 text-purple-900 font-bold py-2 px-6 rounded-xl">
                   Explorar Produtos
                 </Button>
               </Link>
@@ -67,7 +67,11 @@ export default function CartPage() {
                       >
                         <div className="relative w-20 h-20 flex-shrink-0">
                           <Image
-                            src={item.image || "/placeholder.svg?height=80&width=80"}
+                            src={
+                              item.image && item.image.trim() !== ""
+                                ? item.image
+                                : "/placeholder.svg?height=80&width=80"
+                            }
                             alt={item.title}
                             fill
                             className="object-contain"
@@ -139,7 +143,7 @@ export default function CartPage() {
                     </div>
                   </div>
 
-                  <Button className="w-full bg-cyan-400 hover:bg-cyan-500 text-purple-900 font-bold py-6 rounded-xl">
+                  <Button className="w-full bg-orange-500 hover:bg-orange-600 text-purple-900 font-bold py-6 rounded-xl">
                     FINALIZAR COMPRA
                   </Button>
 

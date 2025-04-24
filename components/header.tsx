@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { Search, User, ShoppingCart, Settings, ShoppingBag, LogOut, Sparkles, X } from "lucide-react"
+import { Search, User, ShoppingCart, ShoppingBag, LogOut, Sparkles, X, LogIn } from "lucide-react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useCart } from "@/contexts/cart-context"
 import { useSearch } from "@/contexts/search-context"
+import { useAuth } from "@/contexts/auth-context"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -23,6 +24,7 @@ import { useRouter } from "next/navigation"
 export default function Header() {
   const { totalItems } = useCart()
   const { searchTerm, setSearchTerm, handleSearch, clearSearch } = useSearch()
+  const { user, logout, isAuthenticated } = useAuth()
   const router = useRouter()
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,6 +39,9 @@ export default function Header() {
     router.push("/")
   }
 
+  // Garantir que a URL do logo seja válida
+  const logoUrl = "/logo-wizard.png"
+
   return (
     <header className="bg-purple-800 border-b-2 border-purple-700 rounded-b-xl shadow-lg p-4 relative z-50">
       <div className="container mx-auto flex flex-col md:flex-row items-center justify-between">
@@ -44,7 +49,13 @@ export default function Header() {
           <Link href="/">
             <div className="flex items-center">
               <div className="w-14 h-14 relative mr-2">
-                <Image src="/logo-wizard.png" alt="Mago" width={56} height={56} className="object-contain" />
+                <Image
+                  src={logoUrl || "/placeholder.svg"}
+                  alt="Mago"
+                  width={56}
+                  height={56}
+                  className="object-contain"
+                />
               </div>
               <div className="text-center md:text-left">
                 <h1 className="text-yellow-400 text-2xl md:text-3xl font-bold tracking-wide">
@@ -97,28 +108,45 @@ export default function Header() {
               align="end"
               forceMount
             >
-              <DropdownMenuLabel className="flex items-center gap-2 text-yellow-400">
-                <Sparkles size={16} className="text-yellow-400" />
-                <span>Perfil do Mago</span>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-purple-600" />
-              <DropdownMenuItem className="hover:bg-purple-700 cursor-pointer flex items-center gap-2">
-                <User size={16} className="text-cyan-400" />
-                <span>Meu Perfil</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="hover:bg-purple-700 cursor-pointer flex items-center gap-2">
-                <ShoppingBag size={16} className="text-cyan-400" />
-                <span>Meus Pedidos</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="hover:bg-purple-700 cursor-pointer flex items-center gap-2">
-                <Settings size={16} className="text-cyan-400" />
-                <span>Configurações</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-purple-600" />
-              <DropdownMenuItem className="hover:bg-purple-700 cursor-pointer flex items-center gap-2 text-red-400">
-                <LogOut size={16} />
-                <span>Sair</span>
-              </DropdownMenuItem>
+              {isAuthenticated ? (
+                <>
+                  <DropdownMenuLabel className="flex items-center gap-2 text-yellow-400">
+                    <Sparkles size={16} className="text-yellow-400" />
+                    <span>Olá, {user?.nome || "Mago"}</span>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-purple-600" />
+                  <DropdownMenuItem className="hover:bg-purple-700 cursor-pointer flex items-center gap-2">
+                    <User size={16} className="text-cyan-400" />
+                    <span>Meu Perfil</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-purple-700 cursor-pointer flex items-center gap-2">
+                    <ShoppingBag size={16} className="text-cyan-400" />
+                    <span>Meus Pedidos</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-purple-600" />
+                  <DropdownMenuItem
+                    className="hover:bg-purple-700 cursor-pointer flex items-center gap-2 text-red-400"
+                    onClick={logout}
+                  >
+                    <LogOut size={16} />
+                    <span>Sair</span>
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <>
+                  <DropdownMenuLabel className="flex items-center gap-2 text-yellow-400">
+                    <Sparkles size={16} className="text-yellow-400" />
+                    <span>Portal Mágico</span>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-purple-600" />
+                  <Link href="/login">
+                    <DropdownMenuItem className="hover:bg-purple-700 cursor-pointer flex items-center gap-2">
+                      <LogIn size={16} className="text-cyan-400" />
+                      <span>Entrar</span>
+                    </DropdownMenuItem>
+                  </Link>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
