@@ -1,6 +1,8 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
+import { useAuth } from "@/contexts/auth-context"
+import { API_BASE_URL } from "@/services/api"
 
 export interface CartItem {
   id: number
@@ -18,12 +20,19 @@ interface CartContextType {
   clearCart: () => void
   totalItems: number
   totalPrice: number
+  finalizarCompra: (
+    formaPagamento?: string,
+    observacoes?: string,
+  ) => Promise<{ success: boolean; message: string; pedidoId?: number }>
+  isProcessingCheckout: boolean
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
+  const [isProcessingCheckout, setIsProcessingCheckout] = useState(false)
+  const { user, token, isAuthenticated } = useAuth()
 
   // Load cart from localStorage on initial render
   useEffect(() => {
@@ -83,6 +92,73 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems([])
   }
 
+  const finalizarCompra = async (formaPagamento = "cartao", observacoes = "") => {
+    if (!isAuthenticated || !user || !token) {
+      return {
+        success: false,
+        message: "Você precisa estar autenticado para finalizar a compra.",
+      }
+    }
+
+    if (items.length === 0) {
+      return {
+        success: false,
+        message: "Seu carrinho está vazio.",
+      }
+    }
+
+    try {
+      setIsProcessingCheckout(true)
+
+      // Formatar os dados para o formato esperado pela API
+      const pedidoData = {
+        usuario_id: user.id,
+        forma_pagamento: formaPagamento,
+        observacoes: observacoes,
+        produtos: items.map((item) => ({
+          produto_id: item.id,
+          quantidade: item.quantity,
+          preco_unitario: item.price.toString(),
+        })),
+      }
+
+      // Enviar o pedido para a API
+      const response = await fetch(`${API_BASE_URL}/api/pedidos`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(pedidoData),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || `Erro ao criar pedido: ${response.status}`)
+      }
+
+      const pedidoCriado = await response.json()
+
+      // Limpar o carrinho após finalizar a compra com sucesso
+      clearCart()
+
+      return {
+        success: true,
+        message: "Pedido realizado com sucesso!",
+        pedidoId: pedidoCriado.id,
+      }
+    } catch (error) {
+      console.error("Erro ao finalizar compra:", error)
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : "Ocorreu um erro ao processar seu pedido.",
+      }
+    } finally {
+      setIsProcessingCheckout(false)
+    }
+  }
+
   const totalItems = items.reduce((total, item) => total + item.quantity, 0)
 
   const totalPrice = items.reduce((total, item) => total + item.price * item.quantity, 0)
@@ -97,6 +173,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         clearCart,
         totalItems,
         totalPrice,
+        finalizarCompra,
+        isProcessingCheckout,
       }}
     >
       {children}

@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { Search, User, ShoppingCart, ShoppingBag, LogOut, Sparkles, X, LogIn } from "lucide-react"
+import { Search, User, ShoppingCart, ShoppingBag, LogOut, Sparkles, X, LogIn, UserCircle } from "lucide-react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -115,14 +115,18 @@ export default function Header() {
                     <span>Olá, {user?.nome || "Mago"}</span>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-purple-600" />
-                  <DropdownMenuItem className="hover:bg-purple-700 cursor-pointer flex items-center gap-2">
-                    <User size={16} className="text-cyan-400" />
-                    <span>Meu Perfil</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-purple-700 cursor-pointer flex items-center gap-2">
-                    <ShoppingBag size={16} className="text-cyan-400" />
-                    <span>Meus Pedidos</span>
-                  </DropdownMenuItem>
+                  <Link href="/perfil">
+                    <DropdownMenuItem className="hover:bg-purple-700 cursor-pointer flex items-center gap-2">
+                      <UserCircle size={16} className="text-cyan-400" />
+                      <span>Meu Perfil</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href="/meus-pedidos">
+                    <DropdownMenuItem className="hover:bg-purple-700 cursor-pointer flex items-center gap-2">
+                      <ShoppingBag size={16} className="text-cyan-400" />
+                      <span>Meus Pedidos</span>
+                    </DropdownMenuItem>
+                  </Link>
                   <DropdownMenuSeparator className="bg-purple-600" />
                   <DropdownMenuItem
                     className="hover:bg-purple-700 cursor-pointer flex items-center gap-2 text-red-400"

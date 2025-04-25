@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { CartProvider } from "@/contexts/cart-context"
 import { SearchProvider } from "@/contexts/search-context"
 import { AuthProvider } from "@/contexts/auth-context"
+import { Toaster } from "@/components/ui/toaster"
 import { Suspense } from "react"
 
 const nunito = Nunito({ subsets: ["latin"] })
@@ -30,6 +31,7 @@ export default function RootLayout({
             <CartProvider>
               <SearchProvider>
                 <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+                <Toaster />
               </SearchProvider>
             </CartProvider>
           </AuthProvider>
