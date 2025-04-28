@@ -38,7 +38,8 @@ export interface PaginatedResponse<T> {
 }
 
 // URLs da API
-export const API_BASE_URL = "https://templo-dos-magos-api-80fee8432048.herokuapp.com"
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "https://templo-dos-magos-api-80fee8432048.herokuapp.com"
 const CATEGORIAS_URL = `${API_BASE_URL}/api/categorias` // Corrigido para incluir /api
 const PRODUTOS_URL = `${API_BASE_URL}/api/produtos` // Corrigido para incluir /api
 const AUTH_URL = `${API_BASE_URL}/api/auth/login`
