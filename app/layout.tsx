@@ -26,21 +26,23 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={nunito.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <AuthProvider>
-            <CartProvider>
-              <SearchProvider>
-                <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
-                <Toaster />
-              </SearchProvider>
-            </CartProvider>
-          </AuthProvider>
-        </ThemeProvider>
+        <Suspense fallback={<div>Carregando layout...</div>}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <AuthProvider>
+              <CartProvider>
+                <SearchProvider>
+                  <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+                  <Toaster />
+                </SearchProvider>
+              </CartProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </Suspense>
       </body>
     </html>
   );
