@@ -1,55 +1,67 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { useAuth } from "@/contexts/auth-context"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, Loader2, Sparkles } from "lucide-react"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { useState } from "react";
+import { useAuth } from "@/contexts/auth-context";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, Loader2, Sparkles } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface LoginModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSuccess: () => void
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
 }
 
-export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalProps) {
-  const [email, setEmail] = useState("danilo@teste.com")
-  const [senha, setSenha] = useState("1234567890")
-  const [error, setError] = useState<string | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const { login } = useAuth()
+export default function LoginModal({
+  isOpen,
+  onClose,
+  onSuccess,
+}: LoginModalProps) {
+  const [email, setEmail] = useState("danilo@teste.com");
+  const [senha, setSenha] = useState("1234567890");
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!email || !senha) {
-      setError("Por favor, preencha todos os campos.")
-      return
+      setError("Por favor, preencha todos os campos.");
+      return;
     }
 
-    setError(null)
-    setIsSubmitting(true)
+    setError(null);
+    setIsSubmitting(true);
 
     try {
-      const result = await login(email, senha)
+      const result = await login(email, senha);
 
       if (result.success) {
-        onSuccess()
+        onSuccess();
       } else {
-        setError(result.message || "Erro ao fazer login. Verifique suas credenciais.")
+        setError(
+          result.message || "Erro ao fazer login. Verifique suas credenciais.",
+        );
       }
     } catch (err) {
-      setError("Ocorreu um erro durante o login. Tente novamente mais tarde.")
-      console.error(err)
+      setError("Ocorreu um erro durante o login. Tente novamente mais tarde.");
+      console.error(err);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -127,5 +139,5 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -1,11 +1,21 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { Search, User, ShoppingCart, ShoppingBag, LogOut, Sparkles, X, LogIn, UserCircle } from "lucide-react"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import {
+  Search,
+  User,
+  ShoppingCart,
+  ShoppingBag,
+  LogOut,
+  Sparkles,
+  X,
+  LogIn,
+  UserCircle,
+} from "lucide-react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,34 +23,34 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useCart } from "@/contexts/cart-context"
-import { useSearch } from "@/contexts/search-context"
-import { useAuth } from "@/contexts/auth-context"
-import { Badge } from "@/components/ui/badge"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+} from "@/components/ui/dropdown-menu";
+import { useCart } from "@/contexts/cart-context";
+import { useSearch } from "@/contexts/search-context";
+import { useAuth } from "@/contexts/auth-context";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
-  const { totalItems } = useCart()
-  const { searchTerm, setSearchTerm, handleSearch, clearSearch } = useSearch()
-  const { user, logout, isAuthenticated } = useAuth()
-  const router = useRouter()
+  const { totalItems } = useCart();
+  const { searchTerm, setSearchTerm, handleSearch, clearSearch } = useSearch();
+  const { user, logout, isAuthenticated } = useAuth();
+  const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value)
-  }
+    setSearchTerm(e.target.value);
+  };
 
   const handleClearSearch = () => {
     // Limpar o estado interno
-    clearSearch()
+    clearSearch();
 
     // Redirecionar para a página inicial
-    router.push("/")
-  }
+    router.push("/");
+  };
 
   // Garantir que a URL do logo seja válida
-  const logoUrl = "/logo-wizard.png"
+  const logoUrl = "/logo-wizard.png";
 
   return (
     <header className="bg-purple-800 border-b-2 border-purple-700 rounded-b-xl shadow-lg p-4 relative z-50">
@@ -60,7 +70,9 @@ export default function Header() {
               <div className="text-center md:text-left">
                 <h1 className="text-yellow-400 text-2xl md:text-3xl font-bold tracking-wide">
                   TEMPLO
-                  <span className="block md:inline text-cyan-400 text-xl md:text-3xl">DOS MAGOS</span>
+                  <span className="block md:inline text-cyan-400 text-xl md:text-3xl">
+                    DOS MAGOS
+                  </span>
                 </h1>
               </div>
             </div>
@@ -172,5 +184,5 @@ export default function Header() {
         </div>
       </div>
     </header>
-  )
+  );
 }

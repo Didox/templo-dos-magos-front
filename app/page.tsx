@@ -1,25 +1,25 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useSearchParams } from "next/navigation"
-import Header from "@/components/header"
-import CategorySidebar from "@/components/category-sidebar"
-import ProductGrid from "@/components/product-grid"
-import CartButton from "@/components/cart-button"
-import { useSearch } from "@/contexts/search-context"
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import Header from "@/components/header";
+import CategorySidebar from "@/components/category-sidebar";
+import ProductGrid from "@/components/product-grid";
+import CartButton from "@/components/cart-button";
+import { useSearch } from "@/contexts/search-context";
 
 export default function Home() {
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
-  const searchParams = useSearchParams()
-  const { isSearching } = useSearch()
-  const searchTerm = searchParams.get("search")
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const searchParams = useSearchParams();
+  const { isSearching } = useSearch();
+  const searchTerm = searchParams.get("search");
 
   // Resetar a categoria selecionada quando houver um termo de busca
   useEffect(() => {
     if (searchTerm) {
-      setSelectedCategory(null)
+      setSelectedCategory(null);
     }
-  }, [searchTerm])
+  }, [searchTerm]);
 
   return (
     <main className="min-h-screen bg-purple-900 bg-opacity-95 relative overflow-hidden">
@@ -51,7 +51,10 @@ export default function Home() {
           </div>
 
           <div className="md:col-span-3">
-            <ProductGrid selectedCategory={selectedCategory} searchTerm={searchTerm} />
+            <ProductGrid
+              selectedCategory={selectedCategory}
+              searchTerm={searchTerm}
+            />
             <div className="mt-6 flex justify-center">
               <CartButton />
             </div>
@@ -59,5 +62,5 @@ export default function Home() {
         </div>
       </div>
     </main>
-  )
+  );
 }
