@@ -60,7 +60,7 @@ export default function CategorySidebar({
 
     switch (cor) {
       case "laranja":
-        return "bg-purple-400 hover:bg-purple-500 text-white"; // Substituído por roxo claro
+        return "bg-purple-700 hover:bg-purple-800 text-white";
       case "ciano":
         return "bg-cyan-400 hover:bg-cyan-500 text-purple-900";
       case "azul":

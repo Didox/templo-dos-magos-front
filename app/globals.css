@@ -73,3 +73,11 @@ body {
     @apply border-border;
   }
 }
+
+.bg-blue-500 {
+  background-color: #6e4ff9;
+}
+
+.bg-blue-500:hover {
+  background-color: #6e4ff9;
+}
